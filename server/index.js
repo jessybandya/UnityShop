@@ -1,14 +1,15 @@
-const express = require("express");
-const app = express();
-const cors = require("cors");
-require("dotenv").config({
-  path: "./config.env"
-});
+var express = require("express");
+var app = express();
+var cors = require("cors");
+require("dotenv").config({path: "./config.env"});
 
-
-const port = process.env.PORT || 5000;
 app.use(cors());
-app.use(express.json());
+//app.use(express.json());
+const port = process.env.PORT || 5000;
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 //app.use(require("./routes/record"));
 
 // get driver connection
@@ -16,15 +17,19 @@ app.use(express.json());
 
 //routes
 app.get('/', (req, res) => {
-  res.send('hello world!')})
+  res.send('hello world')})
 
 app.post('/api/register', (req, res) => {
-  console.log(req.body.json());
-  res.send('data in!');
-  res.json( {status: 'ok'} );
+  console.log(req.body)
+  //console.log('Got it!')
+  res.end('data in!');
+  res.json( {status: 'ok'} )
 })
 
+app.delete('/', ()=>{})
+
 app.listen(port, () => {
+  //var host = server.address().address
   /* perform a database connection when server starts
   dbo.connectToServer(function (err) {
     if (err) console.error(err);
