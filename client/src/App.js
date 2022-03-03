@@ -2,7 +2,7 @@
 import React from 'react';
 //Importing AppRouter makes rendering stop!
 import RegistrationForm from './Pages/Register.js';
-//import AppRouter from './Pages/AppRouter.js';
+//import AppRouter from './Routing/AppRouter.js';
 
 
 

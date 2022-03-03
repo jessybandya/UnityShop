@@ -55,4 +55,11 @@ const UserSchema = new Schema({
   }
 });
 
-module.exports = Mongoose.model('User', UserSchema);
+/*Modelling syntax:
+Mongoose.model('<collection Name>', SchemaName)
+*/
+
+//User Model
+const UserModel = Mongoose.model('User', UserSchema);
+
+module.exports = UserModel;

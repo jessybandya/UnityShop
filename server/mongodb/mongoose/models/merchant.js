@@ -36,4 +36,6 @@ const MerchantSchema = new Schema({
   }
 });
 
-module.exports = Mongoose.model('Merchant', MerchantSchema);
+MerchantModel = Mongoose.model('Merchant', MerchantSchema);
+
+module.exports = MerchantModel

@@ -54,6 +54,18 @@ const RegisterUser = () => {
         value={formik.values.email}
       />
     </Form.Field>
+    
+    <Form.Field>
+    <label>EMail</label>
+      <Input
+        id="email"
+        name="email"
+        type="email"
+        onChange={formik.handleChange}
+        value={formik.values.email}
+      />
+    </Form.Field>
+    
       <Button type="submit" floated="right">Submit</Button>
     </Form>
   );

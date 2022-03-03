@@ -1,5 +1,7 @@
 const Mongoose = require('mongoose');
-const { Schema } = Mongoose;
+const {
+  Schema
+} = Mongoose;
 
 // Review Schema
 const ReviewSchema = new Schema({
@@ -7,38 +9,40 @@ const ReviewSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Product',
     default: null
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     default: null
-  },
-  title: {
-    type: String,
-    trim: true
-  },
-  rating: {
-    type: Number,
+    },
+    title: {
+      type: String,
+      trim: true
+    },
+    rating: {
+      type: Number,
     default: 0
-  },
-  review: {
-    type: String,
-    trim: true
-  },
-  isRecommended: {
-    type: Boolean,
+    },
+    review: {
+      type: String,
+      trim: true
+    },
+    isRecommended: {
+      type: Boolean,
     default: true
-  },
-  status: {
-    type: String,
+    },
+    status: {
+      type: String,
     default: 'Waiting Approval',
-    enum: ['Waiting Approval', 'Rejected', 'Approved']
-  },
-  updated: Date,
-  created: {
-    type: Date,
+      enum: ['Waiting Approval', 'Rejected', 'Approved']
+    },
+    updated: Date,
+    created: {
+      type: Date,
     default: Date.now
-  }
-});
+    }
+  });
 
-module.exports = Mongoose.model('Review', ReviewSchema);
+  ReviewModel = Mongoose.model('Review', ReviewSchema);
+
+  module.exports = ReviewModel

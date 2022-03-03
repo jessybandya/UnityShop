@@ -8,7 +8,13 @@ class ItemCard extends Component {
   render() {
     
     return(<div>
+    <nav>Navifation bar</nav>
     <h1> Item Card. </h1>
+    {/*<gallery />
+    <addtocart/>
+    <description />
+    <comments />*/}
+    
     </div>)
   }
 }

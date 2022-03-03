@@ -50,4 +50,6 @@ const CategorySchema = new Schema({
   }
 });
 
-module.exports = Mongoose.model('Category', CategorySchema);
+CategoryModel = Mongoose.model('Category', CategorySchema);
+
+module.exports = CategoryModel
