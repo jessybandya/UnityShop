@@ -8,6 +8,13 @@ class Checkout extends Component {
   render() {
     
     return(<div>
+    <nav>
+    <ul>
+    <li><Link to='/signin'>Sign in</Link></li>
+    <li><Link to='/register'>Register</Link></li>
+    <li><Link to='/homepage'>Go home</Link></li>
+    </ul>
+    </nav>
     <h1>Checkout here.</h1>
     </div>)
   }

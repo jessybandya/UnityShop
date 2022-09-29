@@ -1,8 +1,11 @@
 //CRUD for vendors
-const ProductModel = require('../mongoose/models/product')
+const router = require('express').Router()
+const db = require('../../connector')
+
+const ProductModel = require('../../models/product')
 
 //Post products
-app.post('/products', (req, res)=> {
+router.post('/products', (req, res)=> {
   productModel.create({
     sku: req.body.sku,
     name: req.body.name,
@@ -21,12 +24,12 @@ app.post('/products', (req, res)=> {
 })
 
 //Announce offers
-app.post('/notifications', (req, res) => {
+router.post('/notifications', (req, res) => {
   res.send(req.body.text)
 })
 
 //Remove products
-app.delete('/products', (req, res) => {
+router.delete('/products', (req, res) => {
   ProductModel.deleteOne({
     sku: req.body.sku
   }).then(() => alert('Product deleted!')).catch((error) => {
@@ -34,7 +37,7 @@ app.delete('/products', (req, res) => {
 })
 
 //Modify stock quantity and prices
-app.put('/products', (req, res) => {
+router.put('/products', (req, res) => {
   ProductModel.findOneAndUpdate({
     sku: req.body.sku
   }, {
@@ -58,6 +61,7 @@ app.put('/products', (req, res) => {
 })
 
 /*View sales
-app.get('/sales', (req, res) => {
+router.get('/sales', (req, res) => {
   res.send
 })*/
+module.exports = router;

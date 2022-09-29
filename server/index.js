@@ -1,49 +1,45 @@
-var express = require("express");
-var app = express();
-var cors = require("cors");
-//const router = require('./routes')
 require("dotenv").config({
   path: "./config.env"
 });
-const UserModel = require('./mongodb/mongoose/models/user')
+const express = require("express");
+const app = express();
+const cors = require("cors");
+const routes = require('./mongodb/mongoose/routes')
+const morgan = require('morgan');
 
+//Authentication
+const passport = require('passport');
+require('./mongodb/mongoose/config/passport')(passport);
+const flash = require('connect-flash');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
 //Get connection to MongoDB Atlas
 const db = require('./mongodb/mongoose/connector')
 
+app.use(session({
+  secret: 'ischingystilltheman',
+  resave: true, //confirm this value
+  saveUninitialized: false,
+  cookie: {
+    secure: false
+  }
+})); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash())
 app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 5000;
+app.use(morgan('dev'))
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(cookieParser())
 
-//const bodyParser = require('body-parser');
-//app.use(bodyParser.urlencoded({ extended: true }));
-
-
-//routes
-app.get('/', (req, res) => {
-
-  var data = UserModel.findOne({
-    firstName: 'Ellis'
-  }, function (error, result) {
-    if (error) {
-      throw error
-    }
-    res.send(JSON.stringify(result))
-  })
-
-})
-
-
-app.post('/api/register', (req, res) => {
-  //console.log(req.body)
-  //console.log('Got it!')
-  res.end('data in!');
-  res.json( {
-    status: 'ok'
-  })
-})
-
-app.delete('/', ()=> {})
+//Route addition
+app.use(routes)
 
 app.listen(port, () => {
   //var host = server.address().address

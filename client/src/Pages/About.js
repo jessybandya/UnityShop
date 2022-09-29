@@ -1,7 +1,14 @@
 import React from 'react'
-import { Message } from 'semantic-ui-react'
 
 const About = () => (
+  <div>
+    <nav>
+    <ul>
+    <li><Link to='/signin'>Sign in</Link></li>
+    <li><Link to='/register'>Register</Link></li>
+    <li><Link to='/homepage'>Go home</Link></li>
+  </ul>
+  </nav>
   <Message>
     <Message.Header>About Us</Message.Header>
     <p>
@@ -9,6 +16,7 @@ const About = () => (
       recommend reviewing the changes.
     </p>
   </Message>
+  </div>
 )
 
 export default About

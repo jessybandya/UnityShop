@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-//import { Button, Checkbox, Form, Input, Radio, Select, TextArea } from 'semantic-ui-react'
 
-class Landing extends Component {
+
+class Login extends Component {
  
   state = { };
 
@@ -14,4 +14,4 @@ class Landing extends Component {
   }
 }
 
-export default Landing;
+export default Login;

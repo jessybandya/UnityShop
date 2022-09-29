@@ -1,13 +1,14 @@
 //CRUD functions for Administrators.
-const UserModel = require('../models/user.js')
-const OrderModel = require('../models/order.js')
-const CategoryModel = require('./models/category.js')
-const CategoryModel = require('./models/category.js')
+const router = require('express').Router()
+const db = require('../../connector')
+const UserModel = require('../../models/user.js')
+const OrderModel = require('../../models/order.js')
+const CategoryModel = require('../../models/category.js')
 
 //Turn other users into Administrators or vendors
-app.put('/users', (req, res) => {
+router.put('/users', (req, res) => {
   UserModel.findOneAndUpdate({
-    req.body.id
+    id: req.body.id
   }, {
     role: req.body.role
   },
@@ -18,12 +19,12 @@ app.put('/users', (req, res) => {
 })
 
 //View user orders
-app.get('/orders' (req, res) => {
+router.get('/orders', (req, res) => {
   res.send(OrderModel.find({}))
 })
 
 //Add/remove categories
-app.put('/categories', (req, res) => {
+router.put('/categories', (req, res) => {
   //res.send(CategoryModel.find({}))
   CategoryModel.create({
     name: req.body.name,
@@ -36,7 +37,7 @@ app.put('/categories', (req, res) => {
   })
 })
 
-app.delete('/categories', (req, res) => {
+router.delete('/categories', (req, res) => {
   CategoryModel.deleteOne({
     name: req.body.name
   }).then(function() {
@@ -47,3 +48,4 @@ app.delete('/categories', (req, res) => {
 })
 
 //Send emails
+module.exports = router
