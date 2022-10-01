@@ -1,31 +1,48 @@
-import React, { Component } from 'react'
-//import { Button, Checkbox, Form, Input, Radio, Select, TextArea } from 'semantic-ui-react'
+import * as React from 'react'
+import { Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, CssBaseline, Box } from '@mui/material';
 
-class Admin extends Component {
- 
-  state = { };
+import InboxIcon from '@mui/icons-material/Inbox';
+import MailIcon from '@mui/icons-material/Mail';
+import MenuIcon from '@mui/icons-material/Menu';
 
-  render() {
+function Admin() {
     
     return(<div>
-    <nav>
-    <ul>
-    <li><Link to='/signin'>Sign in</Link></li>
-    <li><Link to='/register'>Register</Link></li>
-    <li><Link to='/homepage'>Go home</Link></li>
-    </ul>
-    </nav>
     
-    
-    <h1>Admin privileges here.</h1>
-    
-    <p>Products</p>
-     <p>Brands</p>
- <p>Buyers</p>
- <p>Sellers</p>
- <p>Admins</p>
+ 
+      <List><ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+      Products</ListItemButton>
+      </ListItem>
+      <ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+     Brands</ListItemButton>
+      </ListItem>
+      <ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+      Clients</ListItemButton>
+      </ListItem>
+      <ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+     Merchants</ListItemButton>
+      </ListItem>
+      <ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+      Admins</ListItemButton>
+      </ListItem>
+      <ListItem>
+      <ListItemButton>
+      <ListItemIcon><MailIcon /></ListItemIcon>
+      Stats</ListItemButton>
+      </ListItem></List>
+      
     </div>)
   }
-}
+
 
 export default Admin;

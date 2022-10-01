@@ -1,35 +1,37 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import {
-  createTheme,
-  ThemeProvider
-} from '@mui/material/styles';
-import {
-  useFormik
-} from 'formik';
-import * as Yup from 'yup';
-import loginFunction from '../HttpFunctions/login'
+import * as React from "react";
+//import { useState, useContext } from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import login from "../services/login";
+import { UserContext } from "../context/user-context.js";
 
 function Copyright(props) {
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      align="center"
+      {...props}
+    >
+      {"Copyright © "}
+      <Link color="inherit" href="https://ebe.uonbi.ac.ke/">
+        EBESA
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
@@ -37,17 +39,17 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
-  
+  const [state, dispatch] = useContext(UserContext);
 
   const formik = useFormik({
     initialValues: {
-      email: '', password: ''
-  },
-    //validationSchema: validationSchema,
-    onSubmit: values => {
-      alert(JSON.stringify(values, null, 2))
-
-      loginFunction(event, values)
+      email: '',
+      password: '',
+    },
+    onSubmit: (values) => {
+      const profile = login(event, values);
+      //Set user context
+      dispatch({ type: "SET_USER", payload: profile });
     },
   });
 
@@ -56,54 +58,59 @@ export default function SignIn() {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
-      sx={ {
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-      >
-          <Avatar sx={ { m: 1, bgcolor: 'secondary.main' }}>
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={ { mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={formik.handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
-        margin="normal"
-        required
-        fullWidth
-        id="email"
-        label="Email Address"
-        name="email"
-        autoComplete="email"
-        autoFocus
-        onChange={formik.handleChange}
-        value={formik.values.email}
-        />
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              onChange={formik.handleChange}
+              value={formik.values.email}
+            />
             <TextField
-        margin="normal"
-        required
-        fullWidth
-        name="password"
-        label="Password"
-        type="password"
-        id="password"
-        autoComplete="current-password"
-        onChange={formik.handleChange}
-        value={formik.values.password}
-        />
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              onChange={formik.handleChange}
+              value={formik.values.password}
+            />
             <FormControlLabel
-        control={<Checkbox value="remember" color="primary" />}
-        label="Remember me"
-        />
+              control={<Checkbox value="remember" color="primary" />}
+              label="Remember me"
+            />
             <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        sx={ { mt: 3, mb: 2 }}
-        >
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
               Sign In
             </Button>
             <Grid container>
@@ -120,7 +127,7 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={ { mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
