@@ -1,4 +1,6 @@
-import * as React from "react";
+import React, { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -13,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+import { UserContext } from "../context/user-context.js";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import register from "../services/register.js";
@@ -27,7 +30,7 @@ function Copyright(props) {
     >
       {"Copyright © "}{" "}
       <Link color="inherit" href="https://mui.com/">
-        Your Website{" "}
+        EBESA{" "}
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}{" "}
@@ -38,11 +41,13 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
-  /*const validationSchema = Yup.object({
+  const [state, dispatch] = useContext(UserContext);
+  const navigate = useNavigate();
+  /* const validationSchema = Yup.object({
     lastName: Yup.string().required(),
     firstName: Yup.string().required(),
     email: Yup.string().email().required(),
-    password: Yup.string().password().required()
+    password: Yup.string().password().required(),
   });*/
 
   const formik = useFormik({
@@ -53,11 +58,22 @@ export default function SignUp() {
       password: "",
     },
     //validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert("Submitting form...");
+    onSubmit: async (values) => {
       //alert(JSON.stringify(values, null, 2))
+      const profile = await register(event, values);
+      alert(JSON.stringify(profile));
+      //Set user context
+      await dispatch({
+        type: "SET_USER",
+        payload: {
+          id: profile.id,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+        },
+      });
 
-      x = register(event, values);
+      navigate("/");
     },
   });
 
@@ -178,7 +194,7 @@ export default function SignUp() {
               {" "}
               <Grid item>
                 {" "}
-                <Link href="#" variant="body2">
+                <Link href="/signin" variant="body2">
                   Already have an account? Sign in{" "}
                 </Link>{" "}
               </Grid>{" "}

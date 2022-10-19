@@ -1,163 +1,289 @@
 //CRUD operations for users
-const router = require('express').Router()
-const db = require('../../connector')
-ProductModel = require('../../models/product.js')
-CartModel = require('../../models/cart.js')
-BrandModel = require('../../models/brand.js')
-UserModel = require('../../models/user.js')
+const router = require("express").Router();
+const db = require("../../connector");
+ProductModel = require("../../models/product.js");
+CartModel = require("../../models/cart.js");
+BrandModel = require("../../models/brand.js");
+UserModel = require("../../models/user.js");
+ArticleModel = require("../../models/article.js");
+const jwt = require("jsonwebtoken");
 
 //Importing dependendlcies
-const passport = require('passport')
-const localStrategy = require('passport-local')
-const session = require('express-session')
-const flash = require('connect-flash')
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const flash = require("connect-flash");
+
+require("dotenv").config({
+  path: require("find-config")(".env"),
+});
+const auth = passport.authenticate("jwt", {
+  session: false,
+});
 
 //Middleware
-router.use(flash())
-router.use(session({
-  secret: 'test-secret', resave: false, saveUninitialized: false
-}))
+router.use(flash());
 
 //A user can:
 //Create an account
-router.post('/signup', passport.authenticate('local-signup', {
-  successRedirect: '/api/client/profile',
-  failureRedirect: '/api/client/signup',
-  failureFlash: true // allow flash messages
-}))
+router.post("/signup", function (req, res, next) {
+  passport.authenticate(
+    "local-signup",
+    { session: false },
+    async function (err, user, info) {
+      try {
+        await UserModel.findOneAndUpdate(
+          { email: req.body.email },
+          { firstName: req.body.firstName, lastName: req.body.lastName },
+          { new: true }
+        );
 
-//Sign in
-router.post('/signin', passport.authenticate('local-login', {
-  successRedirect: '/api/client/profile',
-  failureRedirect: '/api/client/signin',
-  failureFlash: true
-})
-)
+        await req.login(user, { session: false }, (err) => {
+          if (err) {
+            return next(err);
+          }
 
-//Sign out
-router.get("/signout", (req, res)=> {
-  req.logout();
-  res.redirect("/");
+          const payload = {
+            id: user._id,
+            email: user.email,
+          };
+          const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET);
+          console.log("JWT signed.");
+          res.status(200).json({
+            success: true,
+            token: `Bearer ${token}`,
+            user: {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+            },
+          });
+        });
+      } catch (err) {
+        console.log("Passport Signup err: " + err);
+        res.send("Sign up error: " + err);
+        return next(err);
+      }
+    }
+  )(req, res, next);
 });
 
-//loggedIn check for profile route
-function loggedIn(req, res, next) {
-  if (!req.user) {
-    next();
-  } else {
-    console.log('Try again.')
-    res.redirect('/api/client/signin');
+//Sign in
+router.post("/signin", function (req, res, next) {
+  passport.authenticate("local-login", function (err, user, info) {
+    try {
+      if (!user) {
+        console.log("The user dne.");
+      }
+
+      req.login(
+        user,
+        {
+          session: false,
+        },
+        (err) => {
+          if (err) {
+            return next(err);
+          }
+
+          const payload = {
+            id: user._id,
+            email: user.email,
+          };
+          const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET);
+          console.log("JWT signed.");
+          res.status(200).json({
+            success: true,
+            token: `Bearer ${token}`,
+            user: {
+              id: user.id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              role: user.role,
+            },
+          });
+        }
+      );
+    } catch (err) {
+      console.log("Passport err: " + err);
+      res.send("Sign in error: " + err);
+      return next(err);
+    }
+  })(req, res, next);
+});
+
+//Create a new post
+router.post("/articles/new", (req, res) => {
+  try {
+    ArticleModel.create({
+      title: req.body.title,
+      body: req.body.body,
+      author: req.body.author,
+    });
+  } catch (err) {
+    res.send("An error occurred: " + err);
   }
-}
+});
 
-//View his/her profile
-router.get('/profile', loggedIn, (req, res, next) => {
-  console.log('User logged in.')
-  console.log(`${req.user}`)
-  res.send(req.user)
-})
+//Surf through all the articles
+router.get("/articles", async (req, res) => {
+  const articles = await ArticleModel.find({});
+  res.send(articles);
+});
 
-//Update his/her profile
-router.put('/profile/update', (req, res) => {
-  UserModel.findOneAndUpdate({
-    id: req.body.id
-  }, {
-    email: req.body.id,
-    phoneNumber: req.body.phoneNumber,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    password: req.body.password,
-    merchant: req.body.merchant,
-    updated: Date.now,
-  })})
+//Surf through all the users
+router.get("/members", async (req, res) => {
+  const members = await UserModel.find({});
+  
+  res.send(members);
+});
 
-//Surf through all the products
-router.get('/products', (req, res) => {
-  ProductModel.find({})
-  res.send('Serving')
-})
+//View a specific article
+router.get("/articles/:id", async (req, res) => {
+  const article = await ArticleModel.findById(req.params.id);
+  
+  res.send(article);
+});
 
-//Search the database for desired products
-router.get('/search/products', (req, res) => {
-  ProductModel.find({
-    name: req.body.name
-  })
-})
+//Comment on a specific article
+router.post("/articles/:id/comment", async (req, res) => {
+  const article = await ArticleModel.findById(req.params.id);
+  const addComment = await article.comments.push(req.body);
+  console.log("Comment added.");
+});
 
-//Search the database for desired brands
-router.get('/search/brands', (req, res) => {
-  res.send(BrandModel.find({
-    name: req.body.name
-  }))
-})
+//Like a specific article
+router.get("/articles/:id/like", async (req, res) => {
+  console.log("Liking article...");
+  const article = await ArticleModel.findById(req.params.id);
+  const liking = await article.numLikes++;
+  const updated = await article.save();
+  const newNumber = await article.numLikes;
+  res.send("New num of likes=/" + newNumber);
+  console.log(`User Liked ${article.title}.`);
+});
 
-//See product information such as category, price, name, review, picture, etc.
-router.get('/card', (req, res) => {
-  res.send(ProductModel.find({
-    id: req.body.id
-  }))
-})
+//Unlike a specific article
+router.get("/articles/:id/unlike", async (req, res) => {
+  console.log("UnLiking article...");
+  const article = await ArticleModel.findById(req.params.id);
+  const unLiking = await article.numLikes--;
+  const updated = await article.save();
+  const newNumber = await article.numLikes;
+  res.send("New num of likes=/" + newNumber);
+  console.log(`User Unliked ${article.title}.`);
+});
 
-//Add many products to the shopping cart and is able to view the cart
-router.put('/cart', (req, res) => {
-  CartModel.findOneAndUpdate({
-    id: req.body.id
-  }, {
-    product: {
-      type: Schema.Types.ObjectId,
-      ref: 'Product'
+//Search the database for a specific article
+router.post("/articles/search", (req, res) => {
+  try {
+    /*const results = ArticleModel.find({
+    title: req.body,
+  });*/
+    console.log(req.body);
+    res.send(results);
+  } catch (err) {
+    console.log(err);
+    res.send(err);
+  }
+});
+/*Search the database for users
+router.get("/articles/search", (req, res) => {
+  const results = ArticleModel.find({
+    title: req.body.query,
+  });
+});*/
+
+//Search the database for brands
+router.get("/search/brands", (req, res) => {
+  res.send(
+    BrandModel.find({
+      name: req.body.name,
+    })
+  );
+});
+
+//See product information
+router.get("/card", (req, res) => {
+  res.send(
+    ProductModel.find({
+      id: req.body.id,
+    })
+  );
+});
+
+//View and add products to the shopping cart
+router.put("/cart", auth, (req, res) => {
+  CartModel.findOneAndUpdate(
+    {
+      id: req.body.id,
     },
-    quantity: Number,
-    purchasePrice: {
-      type: Number,
-      default: 0
+    {
+      product: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+      quantity: Number,
+      purchasePrice: {
+        type: Number,
+        default: 0,
       },
       totalPrice: {
         type: Number,
-      default: 0
+        default: 0,
       },
       priceWithTax: {
         type: Number,
-      default: 0
+        default: 0,
       },
       totalTax: {
         type: Number,
-      default: 0
+        default: 0,
       },
       status: {
         type: String,
-      default: 'Not processed',
-        enum: ['Not processed', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
-      }
-    })
-  })
+        default: "Not processed",
+        enum: [
+          "Not processed",
+          "Processing",
+          "Shipped",
+          "Delivered",
+          "Cancelled",
+        ],
+      },
+    }
+  );
+});
 
-  //Delete products from the cart
-  router.delete('/cart', (req, res) => {
-    CartModel.deleteOne({
-      id: req.body.id
-    })
-  })
-
-  //Modify the quantity of products inside the cart
-  router.put('/cart', (req, res) => {
-    CartModel.findOneAndUpdate({
-      id: req.body.id
-    }, {
-      quantity: req.body.quantity
-    })
-  })
-
-  //Pay for the products in the cart
-  router.get('/checkout', (req, res) => {
-    //Call StripeJS
-  })
-
-
-  //Sign out
-  router.get("/signout", (req, res)=> {
-    req.logout();
-    res.redirect("/");
+//Delete products from the cart
+router.delete("/cart", auth, (req, res) => {
+  CartModel.deleteOne({
+    id: req.body.id,
   });
-  
-  module.exports = router
+});
+
+//Modify the quantity of products in the cart
+router.put("/cart", auth, (req, res) => {
+  CartModel.findOneAndUpdate(
+    {
+      id: req.body.id,
+    },
+    {
+      quantity: req.body.quantity,
+    }
+  );
+});
+
+//Pay for the products in the cart
+router.get("/checkout", auth, (req, res) => {
+  //Call StripeJS
+});
+
+//Sign out
+router.get("/signout", auth, (req, res) => {
+  req.logout();
+  res.redirect("api/client/signin");
+});
+
+module.exports = router;

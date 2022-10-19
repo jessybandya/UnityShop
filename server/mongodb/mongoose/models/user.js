@@ -1,5 +1,5 @@
 const Mongoose = require('mongoose');
-const bcrypt = require('bcrypt-nodejs')
+const bcryptjs = require('bcryptjs')
 const {
   Schema
 } = Mongoose;
@@ -60,22 +60,35 @@ const UserSchema = new Schema({
     default: Date.now
     }
   });
-/*
+
   //Generating a hash
-  UserSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-  };
+  UserSchema.pre(
+    'save', function() {
+      try {
+       let user = this;
+        this.password = bcryptjs.hashSync(this.password, bcryptjs.genSaltSync(10))
+      } catch(err) {
+        console.log("Hashing error caught! "+ err)}});
 
-  // checking if password is valid
-  UserSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
-  };*/
+  UserSchema.methods = {
+    hash(password) {
+      try {
+        return bcryptjs.hashSync(password,
+          bcrypt.genSaltSync(10));
+      } catch(err) {
+        console.log('Hash generation failed. Error:' + err)}
+    },
+  }
 
-  /*Modelling syntax:
-Mongoose.model('<collection Name>', SchemaName)
-*/
+  UserSchema.methods.isValidPassword = async function(password) {
+    const user = this;
+    const compare = await bcryptjs.compareSync(password,
+      this.password)
+    return compare
+  }
 
-//User Model
-const UserModel = Mongoose.model('User', UserSchema);
+  //Creating User Model
+  const UserModel = Mongoose.model('User',
+    UserSchema);
 
-module.exports = UserModel;
+  module.exports = UserModel;

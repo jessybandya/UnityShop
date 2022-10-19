@@ -1,5 +1,6 @@
-import * as React from "react";
-//import { useState, useContext } from "react";
+import React, { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -41,15 +42,29 @@ const theme = createTheme();
 export default function SignIn() {
   const [state, dispatch] = useContext(UserContext);
 
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
-    onSubmit: (values) => {
-      const profile = login(event, values);
+    onSubmit: async (values) => {
+      const profile = await login(event, values);
+      
       //Set user context
-      dispatch({ type: "SET_USER", payload: profile });
+      await dispatch({
+        type: "SET_USER",
+        payload: {
+          id: profile.id,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+        },
+      });
+
+      //redirect user to homepage while preserving state
+      navigate("/");
     },
   });
 
@@ -114,13 +129,13 @@ export default function SignIn() {
               Sign In
             </Button>
             <Grid container>
-              <Grid item xs>
+              {/*<Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
-              </Grid>
+              </Grid>*/}
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

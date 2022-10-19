@@ -1,5 +1,9 @@
-/client/node_modules
+#Leave these out..
 
-/server/node_modules
+client/.env
 
-/server/mongodb/mongoose/connector.js
+client/node_modules/
+
+server/node_modules/
+
+server/.env

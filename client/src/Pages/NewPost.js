@@ -1,80 +1,117 @@
-import PropTypes from 'prop-types';
-import { Box, Container, Grid, Pagination, TextareaAutosize, Button, Typography } from '@mui/material';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+import React, { useState, useContext, useEffect } from "react";
+import { Box, TextField, Button, Modal, Typography } from "@mui/material";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import { UserContext } from "../context/user-context";
+import publishArticle from "../services/publish.js";
+import { useFormik } from "formik";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+export default function NewPost() {
+  const [state] = useContext(UserContext);
+  const [photos, setPhotos] = useState([]);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const formik = useFormik({
+    initialValues: { title: "", body: "", author: state.user },
+    onSubmit: async (values) => {
+      await publishArticle(event, values);
+      //redirect user to homepage while preserving state
+      //this.props.history.push('/')
+    },
+  });
 
 
-const publishArticle = async (f, x) => {
-  f.preventDefault();
-try{
-  await alert("Publishing article...")
-  //const serverResponse = await axios.post('http://localhost:5000/api/client/signin', x);
-//get token and user from response
-//const token = await serverResponse.data.token;
-//const user = await serverResponse.data.user;
 
-//set JWT token to local
-//localStorage.setItem('token', token);
-//set token to axios common header
-//setAuthToken(token);
-//redirect user to home page
-//if(user.id){window.location.href = '/'} else {alert ('Login failed.')}
-//window.location.href = '/'
-  
-//  return serverResponse
-  
- // {shouldRedirect && <Navigate replace to="/home" />}
- 
-} catch (error) {alert(`An error occurred: ${error}`)}
-}
-
-const NewPost = () => (
-<>
-      <title>
-        Create New Post 
-      </title>
-     <Box
-      component="main"
+  return (
+    <Box
+      component="form"
       sx={{
-        flexGrow: 1,
-        py: 8
+        "& .MuiTextField-root": { m: 1, width: "100%" },
       }}
+      onSubmit={formik.handleSubmit}
+      noValidate
+      autoComplete="off"
     >
-      <Container maxWidth={false}>
-        <Box sx={{ pt: 3 }}>
+      <div>
+        <TextField
+          id="outlined-multiline-flexible"
+          fullwidth
+          label="Title"
+          name="title"
+          multiline
+          maxRows={2}
+          value={formik.values.title}
+          onChange={formik.handleChange}
+        />
+        <TextField
+          id="outlined-multiline-flexible"
+          label="Body"
+          name="body"
+          fullwidth
+          multiline
+          maxRows={40}
+          value={formik.values.body}
+          onChange={formik.handleChange}
+        />
+        <Box>
+          {/* {photos ? <MasonryImageList /> : <></>}
           
-<Typography variant="h6" component="box">
-  Title
-</Typography>
-
-          <TextareaAutosize
-  maxRows={2}
-  aria-label="maximum height"
-  placeholder="Maximum 4 rows"
-  defaultValue="Enter text."
-  style={{ width: "100%", height: "5vh" }} />
-          
-  
-<Typography variant="h6">
-  Body
-</Typography>
-
-          <TextareaAutosize
-  maxRows={4000}
-  aria-label="maximum height"
-  placeholder="Maximum 4 rows"
-  defaultValue="Enter text."
-  style={{ width: "100%", height: "25vh" }}
-/>
-          <Typography>
-  Attachments:
-</Typography>
-          <Button><UploadFileIcon /> Upload File</Button>
-          <Button onClick = "publishArticle()">Publish</Button>
+photos.map(()=>{<img src={} />})
+          <Button fullWidth onClick={handleOpen}>
+            Attach File
+          </Button>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              {" "}
+              <form id="attach">
+                <h3>Attach Files</h3>
+                <div>
+                  <input type="file" multiple />
+                  <p>Enter a caption.</p>
+                  <input type="text" />
+                </div>
+                <div>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    Attach
+                  </Button>
+                </div>
+              </form>{" "}
+            </Box>
+          </Modal>
+*/}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Publish
+          </Button>
         </Box>
-      </Container>
+      </div>
     </Box>
-  </>
-);
-
-
-export default NewPost;
+  );
+}

@@ -1,7 +1,7 @@
 FRONTEND LOGIC
 First page is the login/registration page.
 
-For admins, next page is the management page. Where sales, users, sellers, products, etc qre found.
+For admins, next page is the management page. Where sales, users, sellers, products, etc are found.
 
 For users, the next page is the list page.
 After that, users see a product card with a price, images, title, comments, a rating, an add to cart button and a checkout button.

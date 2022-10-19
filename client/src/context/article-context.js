@@ -1,35 +1,32 @@
 import React, { useReducer, createContext } from "react";
 
-export const UserContext = createContext();
+export const ArticleContext = createContext();
 //userData = null;
 const initialState = {
-  user: {},
+  article: {title: "", body: ""},
   loading: false,
   error: null,
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "SET_USER":
+        case "SELECT_ARTICLE":
       return {
-        user: action.payload,
+        article: action.payload.article,
       };
-    case "DEL_USER":
-      return {
-        user: {},
-      };
-    
     default:
       throw new Error();
   }
 };
 
-export const UserContextProvider = (props) => {
+export const ArticleContextProvider = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <UserContext.Provider value={[state, dispatch]}>
+    <ArticleContext.Provider value={[state, dispatch]}>
+    
       {props.children}
-    </UserContext.Provider>
+    
+    </ArticleContext.Provider>
   );
 };

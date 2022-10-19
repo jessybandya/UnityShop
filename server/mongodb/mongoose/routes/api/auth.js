@@ -42,7 +42,7 @@ router.get('/login', (req, res, next) => {
 })
 
 router.post('/login', passport.authenticate('local'), (req, res, next) => {
-  res.redirext('/secret')})
+  res.redirect('/secret')})
 
 const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated) {
